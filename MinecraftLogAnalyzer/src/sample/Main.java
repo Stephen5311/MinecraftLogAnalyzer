@@ -63,6 +63,7 @@ public class Main extends Application
         grid.add(findMessagesSent,0,3);
 
         Text displayMessagesSent = new Text("Messages Sent: ");
+        grid.add(displayMessagesSent,1,3);
 
         TextField minecraftUsernameField = new TextField();
         minecraftUsernameField.setPromptText("Minecraft Username");
