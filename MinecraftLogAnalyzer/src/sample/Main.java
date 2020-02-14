@@ -42,7 +42,7 @@ public class Main extends Application
 
 
         Button openLogDirectory = new Button("Open Folder");
-        grid.add(openLogDirectory,0,0);
+        grid.add(openLogDirectory,0, 0);
 
         Text displayChosenDirectoryText = new Text();
         grid.add(displayChosenDirectoryText,1,0);
@@ -53,13 +53,28 @@ public class Main extends Application
         Text displayHoursOpenedText = new Text("Hours Played: ");
         grid.add(displayHoursOpenedText,1,1);
 
+        Button findServerHours = new Button("Find Hours On Servers");
+        grid.add(findServerHours,0,2);
+
+        Text displayServerHours = new Text("Hours Played: ");
+        grid.add(displayServerHours,1,2);
+
+        Button findMessagesSent = new Button("Find Messages Sent");
+        grid.add(findMessagesSent,0,3);
+
+        Text displayMessagesSent = new Text("Messages Sent: ");
+
+        TextField minecraftUsernameField = new TextField();
+        minecraftUsernameField.setPromptText("Minecraft Username");
+        grid.add(minecraftUsernameField, 0, 4);
+
         Text info = new Text("Minecraft Log Analyzer - Version 0.1 - Made By Stephen5311 and Zodsmar");
-        grid.add(info, 1,2);
+        grid.add(info, 1,4);
 
 
         final DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setTitle("Open Minecraft's Logs Folder");
-      //  directoryChooser.setInitialDirectory(new File(System.getProperty("user.home") + "/Desktop"));
+        directoryChooser.setInitialDirectory(new File(System.getProperty("user.home") + "/Desktop"));
         StringBuffer sb = new StringBuffer();
 
         openLogDirectory.setOnAction(new EventHandler<ActionEvent>() {
@@ -72,21 +87,27 @@ public class Main extends Application
                     sb.delete(0, sb.length());
                     File[] filesList = directory.listFiles();
                     int i = 0;
-                    for (File file : filesList) {
-                        if (file.isFile() &&  file.getName().contains(".log.gz") || file.getName().contains(".log")) {
+                    for (File file : filesList)
+                    {
+                        if (file.isFile() &&  file.getName().contains(".log.gz") || file.getName().contains(".log"))
+                        {
                             //System.out.println(file.getName());
-                            try {
+                            try
+                            {
                                 Reader r = readGZOrFile(file);
                                 BufferedReader br = new BufferedReader(r);
 
                                 String line;
-                                while ((line = br.readLine()) != null) {
+                                while ((line = br.readLine()) != null)
+                                {
                                     sb.append(line);
                                     sb.append("\n");
                                 }
                                 r.close();
                                 //System.out.println(sb.toString());
-                            } catch (IOException e) {
+                            }
+                            catch (IOException e)
+                            {
                                 System.out.println(e);
                             }
                         }
@@ -103,37 +124,44 @@ public class Main extends Application
         findHoursOpenedButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                if(sb.length() != 0){
+                if(sb.length() != 0)
+                {
                     String[] lines = sb.toString().split("\\n");
-                    for(String s: lines){
-                        System.out.println(s.substring(1,9));
+                    for(String s: lines)
+                    {
+                        System.out.println(s);
                     }
                 }
             }
         });
 
 
-
         primaryStage.setScene(new Scene(grid));
         primaryStage.show();
     }
-    
-    public Reader readGZOrFile(File file){
-        Reader reader = null;
-        try {
 
-            if (file.getName().contains(".log.gz")) {
+    
+    public Reader readGZOrFile(File file)
+    {
+        Reader reader = null;
+        try
+        {
+            if (file.getName().contains(".log.gz"))
+            {
                 InputStream fileStream = new FileInputStream(file);
                 InputStream gzipStream = new GZIPInputStream(fileStream);
                 reader = new InputStreamReader(gzipStream, "UTF-8");
                
-            } else {
+            }
+            else
+            {
                 reader = new FileReader(file);
             }
-        } catch(IOException e){
+        }
+        catch(IOException e)
+        {
             System.out.println(e);
         }
-        
         return reader;
     }
 }
