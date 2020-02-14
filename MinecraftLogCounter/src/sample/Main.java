@@ -14,14 +14,15 @@ import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import java.io.File;
-import java.io.IOException;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.geometry.Insets;
 import java.awt.Desktop;
+import java.util.zip.GZIPInputStream;
 
 
 public class Main extends Application
@@ -69,9 +70,24 @@ public class Main extends Application
                     displayChosenDirectoryText.setText(directory.getAbsolutePath());
 
                     File[] filesList = directory.listFiles();
+                    int i = 0;
                     for (File file : filesList) {
                         if (file.isFile()) {
-                            System.out.println(file.getName());
+                            //System.out.println(file.getName());
+                            try {
+                                Reader r = readGZOrFile(file);
+                                BufferedReader br = new BufferedReader(r);
+                                StringBuffer sb = new StringBuffer();
+                                String line;
+                                while ((line = br.readLine()) != null) {
+                                    sb.append(line);
+                                    sb.append("\n");
+                                }
+                                r.close();
+                                //System.out.println(sb.toString());
+                            } catch (IOException e) {
+                                System.out.println(e);
+                            }
                         }
                     }
                 }
@@ -94,5 +110,24 @@ public class Main extends Application
 
         primaryStage.setScene(new Scene(grid));
         primaryStage.show();
+    }
+    
+    public Reader readGZOrFile(File file){
+        Reader reader = null;
+        try {
+
+            if (file.getName().contains(".log.gz")) {
+                InputStream fileStream = new FileInputStream(file);
+                InputStream gzipStream = new GZIPInputStream(fileStream);
+                reader = new InputStreamReader(gzipStream, "UTF-8");
+               
+            } else {
+                reader = new FileReader(file);
+            }
+        } catch(IOException e){
+            System.out.println(e);
+        }
+        
+        return reader;
     }
 }
