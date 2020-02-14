@@ -16,6 +16,8 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.geometry.Insets;
@@ -56,7 +58,7 @@ public class Main extends Application
 
         final DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setTitle("Open Minecraft's Logs Folder");
-        directoryChooser.setInitialDirectory(new File(System.getProperty("user.home") + "/Desktop"));
+      //  directoryChooser.setInitialDirectory(new File(System.getProperty("user.home") + "/Desktop"));
 
         openLogDirectory.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -65,11 +67,19 @@ public class Main extends Application
                 if (directory != null)
                 {
                     displayChosenDirectoryText.setText(directory.getAbsolutePath());
+
+                    File[] filesList = directory.listFiles();
+                    for (File file : filesList) {
+                        if (file.isFile()) {
+                            System.out.println(file.getName());
+                        }
+                    }
                 }
                 else
                 {
                     displayChosenDirectoryText.setText(null);
                 }
+
             }
         });
 
