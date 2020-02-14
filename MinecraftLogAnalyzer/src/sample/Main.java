@@ -53,7 +53,7 @@ public class Main extends Application
         Text displayHoursOpenedText = new Text("Hours Played: ");
         grid.add(displayHoursOpenedText,1,1);
 
-        Text info = new Text("Minecraft Log Analyzer - Version 0.1 - Made By Stephen5311");
+        Text info = new Text("Minecraft Log Analyzer - Version 0.1 - Made By Stephen5311 and Zodsmar");
         grid.add(info, 1,2);
 
 
