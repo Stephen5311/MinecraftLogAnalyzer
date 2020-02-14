@@ -72,7 +72,7 @@ public class Main extends Application
                     File[] filesList = directory.listFiles();
                     int i = 0;
                     for (File file : filesList) {
-                        if (file.isFile()) {
+                        if (file.isFile() &&  file.getName().contains(".log.gz") || file.getName().contains(".txt")) {
                             //System.out.println(file.getName());
                             try {
                                 Reader r = readGZOrFile(file);
