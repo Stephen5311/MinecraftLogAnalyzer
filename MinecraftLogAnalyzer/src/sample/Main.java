@@ -60,6 +60,7 @@ public class Main extends Application
         final DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setTitle("Open Minecraft's Logs Folder");
       //  directoryChooser.setInitialDirectory(new File(System.getProperty("user.home") + "/Desktop"));
+        StringBuffer sb = new StringBuffer();
 
         openLogDirectory.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -68,7 +69,7 @@ public class Main extends Application
                 if (directory != null)
                 {
                     displayChosenDirectoryText.setText(directory.getAbsolutePath());
-
+                    sb.delete(0, sb.length());
                     File[] filesList = directory.listFiles();
                     int i = 0;
                     for (File file : filesList) {
@@ -77,7 +78,7 @@ public class Main extends Application
                             try {
                                 Reader r = readGZOrFile(file);
                                 BufferedReader br = new BufferedReader(r);
-                                StringBuffer sb = new StringBuffer();
+
                                 String line;
                                 while ((line = br.readLine()) != null) {
                                     sb.append(line);
@@ -102,7 +103,12 @@ public class Main extends Application
         findHoursOpenedButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-
+                if(sb.length() != 0){
+                    String[] lines = sb.toString().split("\\n");
+                    for(String s: lines){
+                        System.out.println(s.substring(1,9));
+                    }
+                }
             }
         });
 
