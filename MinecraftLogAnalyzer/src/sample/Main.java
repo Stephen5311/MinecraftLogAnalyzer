@@ -76,7 +76,7 @@ public class Main extends Application
 
         final DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setTitle("Open Minecraft's Logs Folder");
-        directoryChooser.setInitialDirectory(new File(System.getProperty("user.home") + "/Desktop"));
+        //directoryChooser.setInitialDirectory(new File(System.getProperty("user.home") + "/Desktop"));
         /* hey 🅱️eter I wrote some code */
         ArrayList<String> sList = new ArrayList<String>();
 
@@ -136,11 +136,10 @@ public class Main extends Application
                 for (String lines : sList) {
                     boolean first = true;
                     Calendar earliest = Calendar.getInstance();
+                    System.out.println("Calendar: " + earliest.getTime());
                     int totalTime = 0;
                     for (String line : lines.split("\n")) {
-                        if (line.length() < "[00:00:00]".length()) {
-                            continue;
-                        } else if (line.charAt(0) != '[') {
+                        if (line.length() < "[00:00:00]".length() || line.charAt(0) != '[') {
                             continue;
                         }
 
@@ -155,17 +154,16 @@ public class Main extends Application
                             first = false;
                             earliest = timestamp;
                         }
-
                         if (timestamp.before(earliest)) {
                             totalTime += calendarToSeconds(timestamp) - calendarToSeconds(earliest) + 24 * 60 * 60;
                             earliest = timestamp;
                         }
                     }
                     totalTime += calendarToSeconds(timestamp) - calendarToSeconds(earliest);
-                    System.out.println(totalTime);
+                    System.out.println("Total Time: " + totalTime);
                     realTotalTime += totalTime;
                 }
-                System.out.println(realTotalTime);
+                System.out.println("Total Real Time: " + realTotalTime);
             }
         });
 
@@ -176,7 +174,7 @@ public class Main extends Application
 
     public static int calendarToSeconds(Calendar timestamp) {
         int ret = (timestamp.get(Calendar.HOUR) * 60 + timestamp.get(Calendar.MINUTE)) * 60 + timestamp.get(Calendar.SECOND);
-        System.out.println(ret);
+        System.out.println("Ret: " + ret);
         return ret;
     }
     
