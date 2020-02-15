@@ -16,8 +16,10 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.geometry.Insets;
@@ -72,11 +74,11 @@ public class Main extends Application
         Text info = new Text("Minecraft Log Analyzer - Version 0.1 - Made By Stephen5311 and Zodsmar");
         grid.add(info, 1,4);
 
-
         final DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setTitle("Open Minecraft's Logs Folder");
         directoryChooser.setInitialDirectory(new File(System.getProperty("user.home") + "/Desktop"));
-        StringBuffer sb = new StringBuffer();
+        /* hey 🅱️eter I wrote some code */
+        ArrayList<String> sList = new ArrayList<String>();
 
         openLogDirectory.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -85,7 +87,8 @@ public class Main extends Application
                 if (directory != null)
                 {
                     displayChosenDirectoryText.setText(directory.getAbsolutePath());
-                    sb.delete(0, sb.length());
+                    //sb.delete(0, sb.length());
+                    sList.clear();
                     File[] filesList = directory.listFiles();
                     int i = 0;
                     for (File file : filesList)
@@ -97,6 +100,7 @@ public class Main extends Application
                             {
                                 Reader r = readGZOrFile(file);
                                 BufferedReader br = new BufferedReader(r);
+                                StringBuffer sb = new StringBuffer();
 
                                 String line;
                                 while ((line = br.readLine()) != null)
@@ -105,6 +109,7 @@ public class Main extends Application
                                     sb.append("\n");
                                 }
                                 r.close();
+                                sList.add(sb.toString());
                                 //System.out.println(sb.toString());
                             }
                             catch (IOException e)
@@ -125,14 +130,42 @@ public class Main extends Application
         findHoursOpenedButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                if(sb.length() != 0)
-                {
-                    String[] lines = sb.toString().split("\\n");
-                    for(String s: lines)
-                    {
-                        System.out.println(s);
+                DateFormat format = new SimpleDateFormat("HH:mm:ss", Locale.ENGLISH);
+                Calendar timestamp = Calendar.getInstance();
+                int realTotalTime = 0;
+                for (String lines : sList) {
+                    boolean first = true;
+                    Calendar earliest = Calendar.getInstance();
+                    int totalTime = 0;
+                    for (String line : lines.split("\n")) {
+                        if (line.length() < "[00:00:00]".length()) {
+                            continue;
+                        } else if (line.charAt(0) != '[') {
+                            continue;
+                        }
+
+                        try {
+                            timestamp.setTime(format.parse(line.substring(1, 1 + 6 + 2 + 1)));
+                        } catch (ParseException e) {
+                            System.out.println(line);
+                            continue;
+                        }
+
+                        if (first) {
+                            first = false;
+                            earliest = timestamp;
+                        }
+
+                        if (timestamp.before(earliest)) {
+                            totalTime += calendarToSeconds(timestamp) - calendarToSeconds(earliest) + 24 * 60 * 60;
+                            earliest = timestamp;
+                        }
                     }
+                    totalTime += calendarToSeconds(timestamp) - calendarToSeconds(earliest);
+                    System.out.println(totalTime);
+                    realTotalTime += totalTime;
                 }
+                System.out.println(realTotalTime);
             }
         });
 
@@ -141,6 +174,11 @@ public class Main extends Application
         primaryStage.show();
     }
 
+    public static int calendarToSeconds(Calendar timestamp) {
+        int ret = (timestamp.get(Calendar.HOUR) * 60 + timestamp.get(Calendar.MINUTE)) * 60 + timestamp.get(Calendar.SECOND);
+        System.out.println(ret);
+        return ret;
+    }
     
     public Reader readGZOrFile(File file)
     {
