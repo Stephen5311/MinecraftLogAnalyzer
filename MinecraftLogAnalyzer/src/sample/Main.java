@@ -34,6 +34,8 @@ public class Main extends Application
         launch(args);
     }
 
+    private Text displayHoursOpenedText;
+
     @Override
     public void start(Stage primaryStage) throws Exception
     {
@@ -52,7 +54,7 @@ public class Main extends Application
         Button findHoursOpenedButton = new Button("Find Hours Opened");
         grid.add(findHoursOpenedButton,0,1);
 
-        Text displayHoursOpenedText = new Text("Hours Played: ");
+        displayHoursOpenedText = new Text("Hours Played: ");
         grid.add(displayHoursOpenedText,1,1);
 
         Button findServerHours = new Button("Find Hours On Servers");
@@ -76,7 +78,7 @@ public class Main extends Application
 
         final DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setTitle("Open Minecraft's Logs Folder");
-        //directoryChooser.setInitialDirectory(new File(System.getProperty("user.home") + "/Desktop"));
+        directoryChooser.setInitialDirectory(new File(System.getProperty("user.home") + "/Desktop"));
         /* hey 🅱️eter I wrote some code */
         ArrayList<String> sList = new ArrayList<String>();
 
@@ -131,20 +133,23 @@ public class Main extends Application
             @Override
             public void handle(ActionEvent event) {
                 DateFormat format = new SimpleDateFormat("HH:mm:ss", Locale.ENGLISH);
-                Calendar timestamp = Calendar.getInstance();
+
                 int realTotalTime = 0;
                 for (String lines : sList) {
                     boolean first = true;
-                    Calendar earliest = Calendar.getInstance();
-                    System.out.println("Calendar: " + earliest.getTime());
+                    int last = -1;
                     int totalTime = 0;
                     for (String line : lines.split("\n")) {
-                        if (line.length() < "[00:00:00]".length() || line.charAt(0) != '[') {
+                        if (line.length() < "[00:00:00]".length()) {
+                            continue;
+                        } else if (line.charAt(0) != '[') {
                             continue;
                         }
 
+                        Calendar timestamp = Calendar.getInstance();
                         try {
                             timestamp.setTime(format.parse(line.substring(1, 1 + 6 + 2 + 1)));
+                            //System.out.println(timestamp);
                         } catch (ParseException e) {
                             System.out.println(line);
                             continue;
@@ -152,18 +157,21 @@ public class Main extends Application
 
                         if (first) {
                             first = false;
-                            earliest = timestamp;
+                        } else {
+                            int tmp = calendarToSeconds(timestamp) - last;
+                            if (tmp < 0) {
+                                tmp += 24 * 60 * 60;
+                            }
+                            totalTime += tmp;
+                            // this is new code ^
                         }
-                        if (timestamp.before(earliest)) {
-                            totalTime += calendarToSeconds(timestamp) - calendarToSeconds(earliest) + 24 * 60 * 60;
-                            earliest = timestamp;
-                        }
+                        last = calendarToSeconds(timestamp);
                     }
-                    totalTime += calendarToSeconds(timestamp) - calendarToSeconds(earliest);
-                    System.out.println("Total Time: " + totalTime);
+
+                    //System.out.println(totalTime);
                     realTotalTime += totalTime;
                 }
-                System.out.println("Total Real Time: " + realTotalTime);
+                displayHoursOpenedText.setText(String.format("Hours Played: %.2f hours", (realTotalTime / 3600.0)));
             }
         });
 
@@ -174,7 +182,7 @@ public class Main extends Application
 
     public static int calendarToSeconds(Calendar timestamp) {
         int ret = (timestamp.get(Calendar.HOUR) * 60 + timestamp.get(Calendar.MINUTE)) * 60 + timestamp.get(Calendar.SECOND);
-        System.out.println("Ret: " + ret);
+        //System.out.println(ret);
         return ret;
     }
     
